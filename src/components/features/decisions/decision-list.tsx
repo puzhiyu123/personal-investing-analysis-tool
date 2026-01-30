@@ -69,7 +69,7 @@ export function DecisionList({
       {filtered.map((d) => (
         <div
           key={d.id}
-          className="flex items-start gap-4 rounded-lg border border-sand-200 bg-white p-4 hover:bg-sand-50 transition-colors"
+          className="flex items-start gap-4 rounded-lg border border-border bg-card p-4 hover:bg-muted/50 transition-colors"
         >
           <div className="flex-1 space-y-1">
             <div className="flex items-center gap-2">
@@ -98,7 +98,7 @@ export function DecisionList({
                 ` at ${formatCurrency(d.priceAtDecision)}`}
             </p>
             {d.thesis && (
-              <p className="text-sm text-sand-700">{d.thesis}</p>
+              <p className="text-sm text-foreground/80">{d.thesis}</p>
             )}
             {d.reasoning && (
               <p className="text-xs text-muted-foreground">

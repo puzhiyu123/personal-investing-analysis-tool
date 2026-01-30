@@ -131,7 +131,7 @@ export function AddHoldingForm({ onSuccess }: AddHoldingFormProps) {
             <select
               value={assetType}
               onChange={(e) => setAssetType(e.target.value)}
-              className="flex h-10 w-full rounded-lg border border-sand-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+              className="flex h-10 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
             >
               {ASSET_TYPES.map((t) => (
                 <option key={t.value} value={t.value}>

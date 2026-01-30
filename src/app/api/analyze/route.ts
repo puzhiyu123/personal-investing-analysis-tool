@@ -132,7 +132,12 @@ async function runAnalysis(analysisId: string, ticker: string) {
     }
   );
 
-  // Step 3: Save results
+  // Step 3: Save results (defensive access in case Claude returns unexpected shape)
+  const fin = result.financials ?? {};
+  const moat = result.moat ?? {};
+  const ai = result.aiDisruption ?? {};
+  const scores = result.scores ?? {};
+
   await prisma.companyAnalysis.update({
     where: { id: analysisId },
     data: {
@@ -140,42 +145,60 @@ async function runAnalysis(analysisId: string, ticker: string) {
       companyName: result.companyName || ticker,
 
       // Financials
-      revenueGrowth: JSON.stringify(result.financials.revenueGrowth),
-      ownerEarnings: JSON.stringify(result.financials.ownerEarnings),
-      margins: JSON.stringify(result.financials.margins),
-      roic: JSON.stringify(result.financials.roic),
-      debtToEquity: result.financials.debtToEquity,
-      freeCashFlow: JSON.stringify(result.financials.freeCashFlow),
+      revenueGrowth: JSON.stringify(fin.revenueGrowth ?? null),
+      ownerEarnings: JSON.stringify(fin.ownerEarnings ?? null),
+      margins: JSON.stringify(fin.margins ?? null),
+      roic: JSON.stringify(fin.roic ?? null),
+      debtToEquity: fin.debtToEquity ?? null,
+      freeCashFlow: JSON.stringify(fin.freeCashFlow ?? null),
 
       // Moat
-      moatType: result.moat.type,
-      moatScore: result.moat.score,
-      moatEvidence: JSON.stringify(result.moat.evidence),
-      moatThreats: JSON.stringify(result.moat.threats),
+      moatType: moat.type ?? null,
+      moatScore: moat.score ?? null,
+      moatEvidence: JSON.stringify(moat.evidence ?? []),
+      moatThreats: JSON.stringify(moat.threats ?? []),
 
       // AI Disruption
-      aiDisruptionLevel: result.aiDisruption.level,
-      aiDisruptionScore: result.aiDisruption.score,
-      aiDisruptionAnalysis: result.aiDisruption.analysis,
+      aiDisruptionLevel: ai.level ?? null,
+      aiDisruptionScore: ai.score ?? null,
+      aiDisruptionAnalysis: ai.analysis ?? null,
 
       // Scores
-      businessQualityScore: result.scores.businessQuality,
-      managementScore: result.scores.management,
-      financialStrengthScore: result.scores.financialStrength,
-      valuationScore: result.scores.valuation,
-      moatDurabilityScore: result.scores.moatDurability,
+      businessQualityScore: scores.businessQuality ?? null,
+      managementScore: scores.management ?? null,
+      financialStrengthScore: scores.financialStrength ?? null,
+      valuationScore: scores.valuation ?? null,
+      moatDurabilityScore: scores.moatDurability ?? null,
 
       // Questions
-      generatedQuestions: JSON.stringify(result.generatedQuestions),
+      generatedQuestions: JSON.stringify(result.generatedQuestions ?? []),
 
       // Verdict
-      verdict: result.verdict,
-      verdictReasoning: result.verdictReasoning,
-      executiveSummary: result.executiveSummary,
-      keyRisks: JSON.stringify(result.keyRisks),
-      keyCatalysts: JSON.stringify(result.keyCatalysts),
+      verdict: result.verdict ?? null,
+      verdictReasoning: result.verdictReasoning ?? null,
+      executiveSummary: result.executiveSummary ?? null,
+      keyRisks: JSON.stringify(result.keyRisks ?? []),
+      keyCatalysts: JSON.stringify(result.keyCatalysts ?? []),
 
       rawClaudeResponse: JSON.stringify(result),
     },
   });
+
+  // Auto-add to watchlist for BUY or WATCH verdicts
+  if (result.verdict === "BUY" || result.verdict === "WATCH") {
+    try {
+      await prisma.watchlistItem.create({
+        data: {
+          userId: DEFAULT_USER_ID,
+          ticker,
+          companyName: result.companyName || ticker,
+          reason: `${result.verdict} verdict: ${(result.executiveSummary || "").slice(0, 200)}`,
+          analysisId: analysisId,
+          status: "ACTIVE",
+        },
+      });
+    } catch {
+      // Unique constraint violation — already on watchlist, skip silently
+    }
+  }
 }

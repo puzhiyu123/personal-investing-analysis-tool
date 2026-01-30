@@ -7,8 +7,15 @@ import { HoldingsTable } from "@/components/features/portfolio/holdings-table";
 import { AllocationChart } from "@/components/features/portfolio/allocation-chart";
 import { AddHoldingForm } from "@/components/features/portfolio/add-holding-form";
 import { RebalanceAlert } from "@/components/features/portfolio/rebalance-alert";
+import { PortfolioAlerts } from "@/components/features/portfolio/portfolio-alerts";
+import { ScanButton } from "@/components/features/portfolio/scan-button";
+import { MacroRecommendations } from "@/components/features/portfolio/macro-recommendations";
 import { formatCurrency } from "@/lib/utils";
-import type { AllocationEntry, RebalancingSuggestion } from "@/types/portfolio";
+import type {
+  AllocationEntry,
+  RebalancingSuggestion,
+  PortfolioAlertData,
+} from "@/types/portfolio";
 
 interface Holding {
   id: string;
@@ -29,8 +36,20 @@ export default function PortfolioPage() {
   const [holdings, setHoldings] = useState<Holding[]>([]);
   const [allocation, setAllocation] = useState<AllocationEntry[]>([]);
   const [suggestions, setSuggestions] = useState<RebalancingSuggestion[]>([]);
+  const [alerts, setAlerts] = useState<PortfolioAlertData[]>([]);
   const [totalValue, setTotalValue] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+
+  const fetchAlerts = useCallback(async () => {
+    try {
+      const res = await fetch("/api/portfolio/alerts?status=UNREAD");
+      if (res.ok) {
+        setAlerts(await res.json());
+      }
+    } catch (error) {
+      console.error("Error fetching alerts:", error);
+    }
+  }, []);
 
   const fetchData = useCallback(async () => {
     try {
@@ -57,7 +76,8 @@ export default function PortfolioPage() {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+    fetchAlerts();
+  }, [fetchData, fetchAlerts]);
 
   if (isLoading) {
     return (
@@ -76,13 +96,19 @@ export default function PortfolioPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-3xl text-foreground">Portfolio</h1>
+          <h1 className="font-display text-4xl text-foreground">Portfolio</h1>
           <p className="mt-1 text-muted-foreground">
             Manage your holdings and track allocation
           </p>
         </div>
-        <AddHoldingForm onSuccess={fetchData} />
+        <div className="flex items-center gap-3">
+          <ScanButton onComplete={fetchAlerts} />
+          <AddHoldingForm onSuccess={fetchData} />
+        </div>
       </div>
+
+      {/* Portfolio alerts */}
+      <PortfolioAlerts alerts={alerts} onDismiss={fetchAlerts} />
 
       {/* Summary cards */}
       <div className="grid gap-4 sm:grid-cols-3">
@@ -131,6 +157,9 @@ export default function PortfolioPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Macro recommendations */}
+      <MacroRecommendations />
 
       {/* Rebalancing alerts */}
       <RebalanceAlert suggestions={suggestions} />

@@ -98,7 +98,7 @@ export function HoldingsTable({ holdings, onRefresh }: HoldingsTableProps) {
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-sand-200 text-left text-muted-foreground">
+          <tr className="border-b border-border text-left text-muted-foreground">
             <th
               className="cursor-pointer pb-3 pr-4 font-medium"
               onClick={() => toggleSort("ticker")}
@@ -147,7 +147,7 @@ export function HoldingsTable({ holdings, onRefresh }: HoldingsTableProps) {
             return (
               <tr
                 key={h.id}
-                className="border-b border-sand-100 hover:bg-sand-50 transition-colors"
+                className="border-b border-border/50 hover:bg-muted/50 transition-colors"
               >
                 <td className="py-3 pr-4">
                   <button
@@ -222,6 +222,7 @@ export function HoldingsTable({ holdings, onRefresh }: HoldingsTableProps) {
                       onClick={() =>
                         setExpandedId(isExpanded ? null : h.id)
                       }
+                      aria-label="Toggle details"
                     >
                       <Edit2 className="h-3.5 w-3.5" />
                     </Button>
@@ -231,6 +232,7 @@ export function HoldingsTable({ holdings, onRefresh }: HoldingsTableProps) {
                       className="h-8 w-8 text-red-500 hover:text-red-700"
                       disabled={deletingId === h.id}
                       onClick={() => handleDelete(h.id)}
+                      aria-label="Delete holding"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>

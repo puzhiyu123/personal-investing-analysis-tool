@@ -101,7 +101,55 @@ export function getDalioSystemPrompt(): string {
 - **Critical**: Crisis conditions, capital preservation priority
 
 ## Output:
-Return a JSON object matching the DalioMacroResult TypeScript interface. Be specific with data points and provide actionable portfolio implications. The historical analog should be a specific period that most closely matches current conditions.`;
+Return ONLY a valid JSON object (no markdown, no code fences) with this exact structure:
+
+{
+  "executiveSummary": "2-3 paragraph summary",
+  "cyclePositions": {
+    "shortTermDebtCycle": {
+      "position": "description of current position",
+      "description": "detailed explanation",
+      "phase": "early_expansion" | "late_expansion" | "tightening" | "recession" | "early_recovery"
+    },
+    "longTermDebtCycle": {
+      "position": "description",
+      "description": "detailed explanation",
+      "phase": "early" | "bubble" | "top" | "depression" | "deleveraging" | "normalization"
+    },
+    "businessCycle": {
+      "position": "description",
+      "description": "detailed explanation",
+      "phase": "expansion" | "peak" | "contraction" | "trough"
+    }
+  },
+  "indicators": {
+    "fedFundsRate": 5.25,
+    "yieldCurve": { "spread": -0.5, "inverted": true, "description": "..." },
+    "cpiInflation": 3.2,
+    "pceInflation": 2.8,
+    "unemploymentRate": 3.7,
+    "gdpGrowth": 2.1,
+    "creditSpreads": { "investmentGrade": "...", "highYield": "...", "trend": "..." },
+    "m2MoneySupply": { "growth": "...", "trend": "..." }
+  },
+  "historicalAnalog": {
+    "period": "e.g. 1995-1998",
+    "description": "...",
+    "similarities": ["..."],
+    "differences": ["..."],
+    "howItPlayed": "..."
+  },
+  "portfolioImplications": [
+    { "action": "...", "assetClass": "...", "reasoning": "...", "conviction": "high" | "medium" | "low" }
+  ],
+  "thingsToWatch": [
+    { "indicator": "...", "threshold": "...", "currentValue": "...", "significance": "..." }
+  ],
+  "riskLevel": "Low" | "Moderate" | "Elevated" | "High" | "Critical",
+  "riskAssessment": "..."
+}
+
+Be specific with data points and provide actionable portfolio implications. The historical analog should be a specific period that most closely matches current conditions.`;
 }
 
 export function getDalioUserPrompt(

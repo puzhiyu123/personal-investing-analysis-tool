@@ -1,16 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
+import { Target } from "lucide-react";
 
 interface BuffettScoreProps {
   businessQuality: number | null;
@@ -21,9 +12,47 @@ interface BuffettScoreProps {
 }
 
 function getColor(score: number): string {
-  if (score >= 7) return "#0d9488";
-  if (score >= 5) return "#f59e0b";
-  return "#ef4444";
+  if (score >= 7) return "bg-green-500";
+  if (score >= 5) return "bg-amber-500";
+  return "bg-red-400";
+}
+
+function getTextColor(score: number): string {
+  if (score >= 7) return "text-green-600";
+  if (score >= 5) return "text-amber-600";
+  return "text-red-600";
+}
+
+function ScoreRow({
+  name,
+  score,
+  weight,
+}: {
+  name: string;
+  score: number;
+  weight: string;
+}) {
+  const percentage = (score / 10) * 100;
+
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-lg font-medium text-foreground">{name}</span>
+          <span className="text-sm text-muted-foreground">({weight})</span>
+        </div>
+        <span className={`text-xl font-bold tabular-nums ${getTextColor(score)}`}>
+          {score}
+        </span>
+      </div>
+      <div className="h-2.5 rounded-full bg-muted">
+        <div
+          className={`h-2.5 rounded-full ${getColor(score)} transition-all`}
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+    </div>
+  );
 }
 
 export function BuffettScore({
@@ -52,55 +81,38 @@ export function BuffettScore({
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Buffett Scores</CardTitle>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Overall:</span>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="h-5 w-5 text-primary-500" />
+            Buffett Scores
+          </CardTitle>
+          <div
+            className={`flex items-center gap-1 rounded-xl border px-4 py-2 ${
+              overall >= 7
+                ? "border-green-200 bg-green-50"
+                : overall >= 5
+                  ? "border-amber-200 bg-amber-50"
+                  : "border-red-200 bg-red-50"
+            }`}
+          >
+            <span className="text-sm text-muted-foreground">Overall</span>
             <span
-              className={`text-2xl font-bold ${
-                overall >= 7
-                  ? "text-green-600"
-                  : overall >= 5
-                    ? "text-amber-600"
-                    : "text-red-600"
-              }`}
+              className={`text-3xl font-bold tabular-nums ${getTextColor(overall)}`}
             >
               {overall.toFixed(1)}
             </span>
-            <span className="text-sm text-muted-foreground">/10</span>
+            <span className="text-base text-muted-foreground">/10</span>
           </div>
         </div>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={250}>
-          <BarChart data={data} layout="vertical">
-            <CartesianGrid strokeDasharray="3 3" stroke="#e8e4de" />
-            <XAxis type="number" domain={[0, 10]} ticks={[0, 2, 4, 6, 8, 10]} />
-            <YAxis
-              type="category"
-              dataKey="name"
-              width={130}
-              tick={{ fontSize: 12 }}
-            />
-            <Tooltip
-              formatter={(value: number) => [`${value}/10`, "Score"]}
-              contentStyle={{
-                borderRadius: "8px",
-                border: "1px solid #e8e4de",
-              }}
-            />
-            <Bar dataKey="score" radius={[0, 4, 4, 0]} barSize={24}>
-              {data.map((entry, idx) => (
-                <Cell key={idx} fill={getColor(entry.score)} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-
-        <div className="mt-4 grid grid-cols-5 gap-2 text-center text-xs text-muted-foreground">
+        <div className="space-y-4">
           {data.map((d) => (
-            <div key={d.name}>
-              <span className="font-medium">{d.weight}</span>
-            </div>
+            <ScoreRow
+              key={d.name}
+              name={d.name}
+              score={d.score}
+              weight={d.weight}
+            />
           ))}
         </div>
       </CardContent>

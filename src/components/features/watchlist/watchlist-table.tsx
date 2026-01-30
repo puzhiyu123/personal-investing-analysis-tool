@@ -14,6 +14,8 @@ interface WatchlistItem {
   targetPrice: number | null;
   targetCondition: string | null;
   status: string;
+  lastChecked: string | null;
+  latestNote: string | null;
   createdAt: string;
 }
 
@@ -49,11 +51,13 @@ export function WatchlistTable({ items, onRefresh }: WatchlistTableProps) {
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-sand-200 text-left text-muted-foreground">
+          <tr className="border-b border-border text-left text-muted-foreground">
             <th className="pb-3 pr-4 font-medium">Ticker</th>
             <th className="pb-3 pr-4 font-medium">Reason</th>
             <th className="pb-3 pr-4 font-medium">Target</th>
             <th className="pb-3 pr-4 font-medium">Status</th>
+            <th className="pb-3 pr-4 font-medium">Last Checked</th>
+            <th className="pb-3 pr-4 font-medium">Latest Note</th>
             <th className="pb-3 pr-4 font-medium">Added</th>
             <th className="pb-3 font-medium"></th>
           </tr>
@@ -62,7 +66,7 @@ export function WatchlistTable({ items, onRefresh }: WatchlistTableProps) {
           {items.map((item) => (
             <tr
               key={item.id}
-              className="border-b border-sand-100 hover:bg-sand-50 transition-colors"
+              className="border-b border-border/50 hover:bg-muted/50 transition-colors"
             >
               <td className="py-3 pr-4">
                 <span className="font-semibold">{item.ticker}</span>
@@ -73,7 +77,7 @@ export function WatchlistTable({ items, onRefresh }: WatchlistTableProps) {
                 )}
               </td>
               <td className="py-3 pr-4 max-w-xs">
-                <span className="text-sm text-sand-700 line-clamp-2">
+                <span className="text-sm text-foreground/80 line-clamp-2">
                   {item.reason || "-"}
                 </span>
               </td>
@@ -101,6 +105,14 @@ export function WatchlistTable({ items, onRefresh }: WatchlistTableProps) {
                 >
                   {item.status}
                 </Badge>
+              </td>
+              <td className="py-3 pr-4 text-xs text-muted-foreground">
+                {item.lastChecked ? formatDate(item.lastChecked) : "-"}
+              </td>
+              <td className="py-3 pr-4 max-w-xs">
+                <span className="text-sm text-foreground/80 line-clamp-2">
+                  {item.latestNote || "-"}
+                </span>
               </td>
               <td className="py-3 pr-4 text-xs text-muted-foreground">
                 {formatDate(item.createdAt)}

@@ -1,6 +1,14 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  BarChart3,
+  PieChart,
+  Landmark,
+} from "lucide-react";
 
 interface FinancialAnalysisProps {
   revenueGrowth: string | null;
@@ -20,6 +28,57 @@ function parseJSON(json: string | null): Record<string, unknown> | null {
   }
 }
 
+function MetricCard({
+  icon: Icon,
+  iconColor,
+  label,
+  children,
+}: {
+  icon: React.ElementType;
+  iconColor: string;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-xl border border-border/50 bg-muted/50 p-4 space-y-2">
+      <div className="flex items-center gap-2">
+        <Icon className={`h-4 w-4 ${iconColor}`} />
+        <h4 className="text-base font-semibold text-muted-foreground uppercase tracking-wide">
+          {label}
+        </h4>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function MarginBar({
+  label,
+  value,
+}: {
+  label: string;
+  value: number;
+}) {
+  const width = Math.min(Math.max(value, 0), 100);
+  const color =
+    value >= 30 ? "bg-green-500" : value >= 15 ? "bg-amber-500" : "bg-red-400";
+
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center justify-between">
+        <span className="text-base text-muted-foreground">{label}</span>
+        <span className="text-base font-semibold tabular-nums">{value}%</span>
+      </div>
+      <div className="h-2 rounded-full bg-muted">
+        <div
+          className={`h-2 rounded-full ${color} transition-all`}
+          style={{ width: `${width}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function FinancialAnalysis({
   revenueGrowth,
   ownerEarnings,
@@ -37,106 +96,167 @@ export function FinancialAnalysis({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Financial Analysis</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <BarChart3 className="h-5 w-5 text-primary-500" />
+          Financial Analysis
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {revenue && (
-            <div className="space-y-1">
-              <h4 className="text-sm font-medium text-muted-foreground">
-                Revenue Growth
-              </h4>
-              <p className="text-lg font-semibold">
+            <MetricCard
+              icon={TrendingUp}
+              iconColor="text-green-500"
+              label="Revenue Growth"
+            >
+              <p className="text-3xl font-bold tabular-nums">
                 {(revenue.fiveYearCAGR as number)?.toFixed(1) ??
                   revenue.trend}
-                {revenue.fiveYearCAGR != null && "% CAGR (5yr)"}
+                {revenue.fiveYearCAGR != null && "%"}
               </p>
-              <p className="text-xs text-muted-foreground">
-                {revenue.assessment as string || revenue.trend as string}
+              {revenue.fiveYearCAGR != null && (
+                <p className="text-base text-muted-foreground">
+                  5-year CAGR
+                </p>
+              )}
+              <p className="text-base text-muted-foreground">
+                {(revenue.assessment as string) ||
+                  (revenue.trend as string)}
               </p>
-            </div>
+            </MetricCard>
           )}
 
           {marginData && (
-            <div className="space-y-1">
-              <h4 className="text-sm font-medium text-muted-foreground">
-                Margins
-              </h4>
-              <div className="space-y-0.5 text-sm">
+            <MetricCard
+              icon={PieChart}
+              iconColor="text-blue-500"
+              label="Margins"
+            >
+              <div className="space-y-2.5">
                 {marginData.gross != null && (
-                  <p>
-                    Gross: <span className="font-medium">{marginData.gross as number}%</span>
-                  </p>
+                  <MarginBar
+                    label="Gross"
+                    value={marginData.gross as number}
+                  />
                 )}
                 {marginData.operating != null && (
-                  <p>
-                    Operating:{" "}
-                    <span className="font-medium">{marginData.operating as number}%</span>
-                  </p>
+                  <MarginBar
+                    label="Operating"
+                    value={marginData.operating as number}
+                  />
                 )}
                 {marginData.net != null && (
-                  <p>
-                    Net: <span className="font-medium">{marginData.net as number}%</span>
-                  </p>
+                  <MarginBar
+                    label="Net"
+                    value={marginData.net as number}
+                  />
                 )}
               </div>
-              <p className="text-xs text-muted-foreground">
-                {marginData.trend as string}
-              </p>
-            </div>
+              {!!marginData.trend && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {String(marginData.trend)}
+                </p>
+              )}
+            </MetricCard>
           )}
 
           {roicData && (
-            <div className="space-y-1">
-              <h4 className="text-sm font-medium text-muted-foreground">
-                ROIC
-              </h4>
-              <p className="text-lg font-semibold">
+            <MetricCard
+              icon={TrendingUp}
+              iconColor="text-teal-500"
+              label="ROIC"
+            >
+              <p className="text-3xl font-bold tabular-nums">
                 {(roicData.current as number)?.toFixed(1) ?? "-"}%
               </p>
-              <p className="text-xs text-muted-foreground">
-                5yr avg: {(roicData.fiveYearAvg as number)?.toFixed(1) ?? "-"}%
-                {roicData.vsWacc ? ` | ${String(roicData.vsWacc)}` : null}
+              <p className="text-base text-muted-foreground">
+                5yr avg:{" "}
+                {(roicData.fiveYearAvg as number)?.toFixed(1) ?? "-"}%
               </p>
-            </div>
+              {roicData.vsWacc != null && (
+                <p className="text-base text-muted-foreground">
+                  {String(roicData.vsWacc)}
+                </p>
+              )}
+            </MetricCard>
           )}
 
           {debtToEquity != null && (
-            <div className="space-y-1">
-              <h4 className="text-sm font-medium text-muted-foreground">
-                Debt/Equity
-              </h4>
-              <p className="text-lg font-semibold">
+            <MetricCard
+              icon={Landmark}
+              iconColor="text-purple-500"
+              label="Debt / Equity"
+            >
+              <p
+                className={`text-2xl font-bold tabular-nums ${
+                  debtToEquity <= 0.5
+                    ? "text-green-600"
+                    : debtToEquity <= 1.5
+                      ? "text-amber-600"
+                      : "text-red-600"
+                }`}
+              >
                 {debtToEquity.toFixed(2)}
               </p>
-            </div>
+              <p className="text-base text-muted-foreground">
+                {debtToEquity <= 0.5
+                  ? "Conservative leverage"
+                  : debtToEquity <= 1.5
+                    ? "Moderate leverage"
+                    : "High leverage"}
+              </p>
+            </MetricCard>
           )}
 
           {earnings && (
-            <div className="space-y-1">
-              <h4 className="text-sm font-medium text-muted-foreground">
-                Owner Earnings
-              </h4>
-              <p className="text-lg font-semibold">
-                {earnings.latestValue as string || "-"}
+            <MetricCard
+              icon={DollarSign}
+              iconColor="text-green-600"
+              label="Owner Earnings"
+            >
+              <p className="text-3xl font-bold tabular-nums">
+                {(earnings.latestValue as string) || "-"}
               </p>
-              <p className="text-xs text-muted-foreground">
-                {earnings.trend as string}
-              </p>
-            </div>
+              {!!earnings.trend && (
+                <p className="text-base text-muted-foreground">
+                  {String(earnings.trend)}
+                </p>
+              )}
+            </MetricCard>
           )}
 
           {fcf && (
-            <div className="space-y-1">
-              <h4 className="text-sm font-medium text-muted-foreground">
-                Free Cash Flow
-              </h4>
-              <p className="text-lg font-semibold">{fcf.latest as string || "-"}</p>
-              <p className="text-xs text-muted-foreground">
-                {fcf.trend as string}
-                {fcf.perShare ? ` | ${String(fcf.perShare)}/share` : null}
+            <MetricCard
+              icon={
+                String(fcf.trend)
+                  .toLowerCase()
+                  .includes("declin")
+                  ? TrendingDown
+                  : TrendingUp
+              }
+              iconColor={
+                String(fcf.trend)
+                  .toLowerCase()
+                  .includes("declin")
+                  ? "text-red-500"
+                  : "text-green-500"
+              }
+              label="Free Cash Flow"
+            >
+              <p className="text-3xl font-bold tabular-nums">
+                {(fcf.latest as string) || "-"}
               </p>
-            </div>
+              {!!fcf.perShare && (
+                <p className="text-base text-muted-foreground">
+                  {String(fcf.perShare)}/share
+                </p>
+              )}
+              {!!fcf.trend && (
+                <p className="text-base text-muted-foreground">
+                  {String(fcf.trend)}
+                </p>
+              )}
+            </MetricCard>
           )}
         </div>
       </CardContent>

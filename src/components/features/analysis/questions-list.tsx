@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { HelpCircle } from "lucide-react";
 
 interface Question {
@@ -34,7 +35,6 @@ export function QuestionsList({
       });
     } catch (error) {
       console.error("Failed to update questions:", error);
-      // Revert
       setQuestions(initialQuestions);
     }
   }
@@ -48,6 +48,8 @@ export function QuestionsList({
   });
 
   const answeredCount = questions.filter((q) => q.answered).length;
+  const progressPercent =
+    questions.length > 0 ? (answeredCount / questions.length) * 100 : 0;
 
   return (
     <Card>
@@ -57,40 +59,64 @@ export function QuestionsList({
             <HelpCircle className="h-5 w-5 text-primary-500" />
             Research Questions
           </CardTitle>
-          <span className="text-sm text-muted-foreground">
+          <Badge
+            variant={progressPercent === 100 ? "success" : "outline"}
+            size="lg"
+          >
             {answeredCount}/{questions.length} answered
-          </span>
+          </Badge>
+        </div>
+        <div className="mt-3 h-2 rounded-full bg-muted">
+          <div
+            className="h-2 rounded-full bg-primary-500 transition-all"
+            style={{ width: `${progressPercent}%` }}
+          />
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        {Object.entries(grouped).map(([category, items]) => (
-          <div key={category}>
-            <h4 className="text-sm font-medium text-foreground mb-2">
-              {category}
-            </h4>
-            <ul className="space-y-2">
-              {items.map(({ question: q, index }) => (
-                <li key={index} className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    checked={q.answered}
-                    onChange={() => toggleQuestion(index)}
-                    className="mt-1 h-4 w-4 rounded border-sand-300 text-primary-500 focus:ring-primary-500"
-                  />
-                  <span
-                    className={`text-sm ${
-                      q.answered
-                        ? "text-muted-foreground line-through"
-                        : "text-sand-700"
+        {Object.entries(grouped).map(([category, items]) => {
+          const categoryAnswered = items.filter(
+            (i) => i.question.answered
+          ).length;
+          return (
+            <div key={category}>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-lg font-semibold text-foreground">
+                  {category}
+                </h4>
+                <span className="text-base text-muted-foreground">
+                  {categoryAnswered}/{items.length}
+                </span>
+              </div>
+              <ul className="space-y-2">
+                {items.map(({ question: q, index }) => (
+                  <li
+                    key={index}
+                    className={`flex items-start gap-3 rounded-lg px-3 py-2.5 transition-colors ${
+                      q.answered ? "bg-muted/50" : "hover:bg-muted/30"
                     }`}
                   >
-                    {q.question}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+                    <input
+                      type="checkbox"
+                      checked={q.answered}
+                      onChange={() => toggleQuestion(index)}
+                      className="mt-0.5 h-4.5 w-4.5 rounded border-border text-primary-500 focus:ring-primary-500 cursor-pointer"
+                    />
+                    <span
+                      className={`text-lg leading-relaxed ${
+                        q.answered
+                          ? "text-muted-foreground line-through"
+                          : "text-foreground/80"
+                      }`}
+                    >
+                      {q.question}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
       </CardContent>
     </Card>
   );

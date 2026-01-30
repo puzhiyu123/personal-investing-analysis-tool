@@ -9,9 +9,15 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
+    const { reason, targetPrice, targetCondition, status } = body;
     const item = await prisma.watchlistItem.update({
       where: { id },
-      data: body,
+      data: {
+        ...(reason !== undefined && { reason }),
+        ...(targetPrice !== undefined && { targetPrice }),
+        ...(targetCondition !== undefined && { targetCondition }),
+        ...(status !== undefined && { status }),
+      },
     });
 
     return NextResponse.json(item);

@@ -44,7 +44,7 @@ export function AnalysisProgress({ status }: AnalysisProgressProps) {
               {i === 0 ? (
                 <Loader2 className="h-4 w-4 animate-spin text-primary-500" />
               ) : (
-                <Circle className="h-4 w-4 text-sand-300" />
+                <Circle className="h-4 w-4 text-muted-foreground/50" />
               )}
               <span
                 className={`text-sm ${

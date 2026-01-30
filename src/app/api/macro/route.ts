@@ -110,43 +110,39 @@ async function runMacroAnalysis(reportId: string) {
     }
   );
 
-  // Step 3: Save results
+  // Step 3: Save results (defensive access in case Claude returns unexpected shape)
+  const cycles = result.cyclePositions ?? {};
+  const ind = result.indicators ?? {};
+  const analog = result.historicalAnalog ?? {};
+
   await prisma.macroReport.update({
     where: { id: reportId },
     data: {
       status: "COMPLETE",
 
-      shortTermDebtCycle: JSON.stringify(
-        result.cyclePositions.shortTermDebtCycle
-      ),
-      longTermDebtCycle: JSON.stringify(
-        result.cyclePositions.longTermDebtCycle
-      ),
-      businessCycle: JSON.stringify(result.cyclePositions.businessCycle),
+      shortTermDebtCycle: JSON.stringify(cycles.shortTermDebtCycle ?? null),
+      longTermDebtCycle: JSON.stringify(cycles.longTermDebtCycle ?? null),
+      businessCycle: JSON.stringify(cycles.businessCycle ?? null),
 
-      fedFundsRate: result.indicators.fedFundsRate,
-      yieldCurve: JSON.stringify(result.indicators.yieldCurve),
-      cpiInflation: result.indicators.cpiInflation,
-      pceInflation: result.indicators.pceInflation,
-      unemploymentRate: result.indicators.unemploymentRate,
-      gdpGrowth: result.indicators.gdpGrowth,
-      creditSpreads: JSON.stringify(result.indicators.creditSpreads),
-      m2MoneySupply: JSON.stringify(result.indicators.m2MoneySupply),
+      fedFundsRate: ind.fedFundsRate ?? null,
+      yieldCurve: JSON.stringify(ind.yieldCurve ?? null),
+      cpiInflation: ind.cpiInflation ?? null,
+      pceInflation: ind.pceInflation ?? null,
+      unemploymentRate: ind.unemploymentRate ?? null,
+      gdpGrowth: ind.gdpGrowth ?? null,
+      creditSpreads: JSON.stringify(ind.creditSpreads ?? null),
+      m2MoneySupply: JSON.stringify(ind.m2MoneySupply ?? null),
 
-      historicalAnalogPeriod: result.historicalAnalog.period,
-      historicalAnalogDescription: result.historicalAnalog.description,
-      historicalAnalogSimilarities: JSON.stringify(
-        result.historicalAnalog.similarities
-      ),
-      historicalAnalogDifferences: JSON.stringify(
-        result.historicalAnalog.differences
-      ),
+      historicalAnalogPeriod: analog.period ?? null,
+      historicalAnalogDescription: analog.description ?? null,
+      historicalAnalogSimilarities: JSON.stringify(analog.similarities ?? []),
+      historicalAnalogDifferences: JSON.stringify(analog.differences ?? []),
 
-      portfolioImplications: JSON.stringify(result.portfolioImplications),
-      thingsToWatch: JSON.stringify(result.thingsToWatch),
-      riskLevel: result.riskLevel,
+      portfolioImplications: JSON.stringify(result.portfolioImplications ?? []),
+      thingsToWatch: JSON.stringify(result.thingsToWatch ?? []),
+      riskLevel: result.riskLevel ?? null,
 
-      executiveSummary: result.executiveSummary,
+      executiveSummary: result.executiveSummary ?? null,
       fullReport: JSON.stringify(result),
     },
   });

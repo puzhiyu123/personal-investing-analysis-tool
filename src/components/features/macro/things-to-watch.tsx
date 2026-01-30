@@ -17,7 +17,8 @@ interface ThingsToWatchProps {
 function parseItems(json: string | null): WatchItem[] {
   if (!json) return [];
   try {
-    return JSON.parse(json);
+    const parsed = JSON.parse(json);
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }
@@ -30,44 +31,36 @@ export function ThingsToWatch({ items }: ThingsToWatchProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-2xl">
           <Eye className="h-5 w-5 text-primary-500" />
           Things to Watch
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-sand-200 text-left text-muted-foreground">
-                <th className="pb-2 pr-4 font-medium">Indicator</th>
-                <th className="pb-2 pr-4 font-medium">Current</th>
-                <th className="pb-2 pr-4 font-medium">Threshold</th>
-                <th className="pb-2 font-medium">Significance</th>
-              </tr>
-            </thead>
-            <tbody>
-              {watchItems.map((item, i) => (
-                <tr
-                  key={i}
-                  className="border-b border-sand-100"
-                >
-                  <td className="py-2 pr-4 font-medium">
-                    {item.indicator}
-                  </td>
-                  <td className="py-2 pr-4 tabular-nums">
-                    {item.currentValue}
-                  </td>
-                  <td className="py-2 pr-4 tabular-nums text-muted-foreground">
-                    {item.threshold}
-                  </td>
-                  <td className="py-2 text-muted-foreground text-xs">
-                    {item.significance}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="space-y-6">
+          {watchItems.map((item, i) => (
+            <div
+              key={i}
+              className="rounded-xl border border-border bg-muted/50 p-5"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+                <h4 className="text-xl font-semibold text-foreground">
+                  {item.indicator}
+                </h4>
+                <div className="flex items-center gap-3">
+                  <span className="text-base tabular-nums font-medium text-foreground">
+                    Current: {item.currentValue}
+                  </span>
+                  <span className="text-base tabular-nums text-muted-foreground">
+                    Threshold: {item.threshold}
+                  </span>
+                </div>
+              </div>
+              <p className="text-lg text-foreground/80 leading-relaxed">
+                {item.significance}
+              </p>
+            </div>
+          ))}
         </div>
       </CardContent>
     </Card>

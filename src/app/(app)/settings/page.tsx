@@ -73,7 +73,7 @@ export default function SettingsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-3xl text-foreground">Settings</h1>
+        <h1 className="font-display text-4xl text-foreground">Settings</h1>
         <p className="mt-1 text-muted-foreground">
           Configure your allocation targets and preferences
         </p>
@@ -109,7 +109,7 @@ export default function SettingsPage() {
             </div>
           ))}
 
-          <div className="flex items-center justify-between border-t border-sand-200 pt-4">
+          <div className="flex items-center justify-between border-t border-border pt-4">
             <span
               className={`text-sm font-medium ${
                 Math.abs(total - 100) > 0.1

@@ -50,7 +50,7 @@ export default function DecisionsPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-3xl text-foreground">
+          <h1 className="font-display text-4xl text-foreground">
             Decision Log
           </h1>
           <p className="mt-1 text-muted-foreground">
@@ -84,7 +84,7 @@ export default function DecisionsPage() {
                       (a === "ALL" && !filterAction) ||
                       filterAction === a
                         ? "bg-primary-500 text-white"
-                        : "bg-sand-100 text-sand-600 hover:bg-sand-200"
+                        : "bg-muted text-muted-foreground hover:bg-muted/80"
                     }`}
                   >
                     {a}

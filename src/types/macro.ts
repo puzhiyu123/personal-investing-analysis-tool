@@ -34,6 +34,7 @@ export interface MacroReportData {
   riskLevel: string | null;
 
   executiveSummary: string | null;
+  simplifiedReport: string | null;
   fullReport: string | null;
 }
 

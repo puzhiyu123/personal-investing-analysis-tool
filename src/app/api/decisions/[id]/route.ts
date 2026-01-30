@@ -29,9 +29,16 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
+    const { thesis, reasoning, priceAtDecision, outcome, followUpNotes } = body;
     const decision = await prisma.decision.update({
       where: { id },
-      data: body,
+      data: {
+        ...(thesis !== undefined && { thesis }),
+        ...(reasoning !== undefined && { reasoning }),
+        ...(priceAtDecision !== undefined && { priceAtDecision }),
+        ...(outcome !== undefined && { outcome }),
+        ...(followUpNotes !== undefined && { followUpNotes }),
+      },
     });
 
     return NextResponse.json(decision);

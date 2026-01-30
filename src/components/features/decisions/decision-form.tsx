@@ -107,7 +107,7 @@ export function DecisionForm({ onSuccess }: DecisionFormProps) {
               <select
                 value={action}
                 onChange={(e) => setAction(e.target.value)}
-                className="flex h-10 w-full rounded-lg border border-sand-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                className="flex h-10 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
               >
                 {ACTIONS.map((a) => (
                   <option key={a} value={a}>

@@ -55,7 +55,7 @@ export default function MacroPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-3xl text-foreground">
+        <h1 className="font-display text-4xl text-foreground">
           Macro Analysis
         </h1>
         <p className="mt-1 text-muted-foreground">
@@ -76,7 +76,7 @@ export default function MacroPage() {
                 <Link
                   key={r.id}
                   href={`/macro/${r.id}`}
-                  className="flex items-center justify-between rounded-lg border border-sand-200 bg-white p-4 hover:bg-sand-50 transition-colors"
+                  className="flex items-center justify-between rounded-lg border border-border bg-card p-4 hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <span className="font-medium">

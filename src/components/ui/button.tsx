@@ -13,10 +13,10 @@ const buttonVariants = cva(
         destructive:
           "bg-error text-white hover:bg-red-600 active:bg-red-700",
         outline:
-          "border border-sand-300 bg-transparent hover:bg-sand-100 active:bg-sand-200",
+          "border border-border bg-transparent hover:bg-muted active:bg-muted/80",
         secondary:
-          "bg-sand-200 text-sand-800 hover:bg-sand-300 active:bg-sand-400",
-        ghost: "hover:bg-sand-100 active:bg-sand-200",
+          "bg-muted text-foreground hover:bg-muted/80 active:bg-muted/60",
+        ghost: "hover:bg-muted active:bg-muted/80",
         link: "text-primary-600 underline-offset-4 hover:underline",
         accent:
           "bg-accent-500 text-white hover:bg-accent-600 active:bg-accent-700",

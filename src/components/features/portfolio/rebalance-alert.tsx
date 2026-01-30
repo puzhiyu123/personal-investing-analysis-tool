@@ -15,9 +15,9 @@ export function RebalanceAlert({ suggestions }: RebalanceAlertProps) {
   }
 
   return (
-    <Card className="border-amber-200 bg-amber-50/50">
+    <Card className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/30">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-amber-800">
+        <CardTitle className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
           <AlertTriangle className="h-5 w-5" />
           Rebalancing Alerts
         </CardTitle>
@@ -27,7 +27,7 @@ export function RebalanceAlert({ suggestions }: RebalanceAlertProps) {
           {suggestions.map((s) => (
             <div
               key={s.assetType}
-              className="flex items-start gap-3 rounded-lg bg-white/60 p-3"
+              className="flex items-start gap-3 rounded-lg bg-white/60 dark:bg-white/5 p-3"
             >
               {s.action === "INCREASE" ? (
                 <TrendingUp className="mt-0.5 h-4 w-4 text-green-600 shrink-0" />
@@ -35,7 +35,7 @@ export function RebalanceAlert({ suggestions }: RebalanceAlertProps) {
                 <TrendingDown className="mt-0.5 h-4 w-4 text-red-600 shrink-0" />
               )}
               <div className="flex-1">
-                <p className="text-sm font-medium text-sand-900">
+                <p className="text-sm font-medium text-foreground">
                   {s.message}
                 </p>
                 <div className="mt-1 flex gap-2">

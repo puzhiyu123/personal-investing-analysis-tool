@@ -87,3 +87,25 @@ export function computeGainLoss(holding: {
     holding.totalCost > 0 ? (gainLoss / holding.totalCost) * 100 : 0;
   return { gainLoss, gainLossPercent };
 }
+
+export interface PortfolioAlertData {
+  id: string;
+  ticker: string | null;
+  alertType: string;
+  severity: string;
+  title: string;
+  description: string;
+  actionSuggested: string | null;
+  source: string;
+  status: string;
+  createdAt: string;
+}
+
+export interface PortfolioScanData {
+  id: string;
+  status: string;
+  tickersScanned: string | null;
+  alertsGenerated: number;
+  summary: string | null;
+  createdAt: string;
+}

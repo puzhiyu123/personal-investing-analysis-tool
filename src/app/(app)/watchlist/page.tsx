@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { WatchlistTable } from "@/components/features/watchlist/watchlist-table";
 import { AddWatchlistForm } from "@/components/features/watchlist/add-watchlist-form";
+import { ScanWatchlistButton } from "@/components/features/watchlist/scan-watchlist-button";
 
 export default function WatchlistPage() {
   const [items, setItems] = useState([]);
@@ -37,12 +38,15 @@ export default function WatchlistPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-3xl text-foreground">Watchlist</h1>
+          <h1 className="font-display text-4xl text-foreground">Watchlist</h1>
           <p className="mt-1 text-muted-foreground">
             Companies you&apos;re monitoring for potential investment
           </p>
         </div>
-        <AddWatchlistForm onSuccess={fetchData} />
+        <div className="flex items-center gap-3">
+          <ScanWatchlistButton onComplete={fetchData} />
+          <AddWatchlistForm onSuccess={fetchData} />
+        </div>
       </div>
 
       <Card>

@@ -36,6 +36,9 @@ export async function PATCH(
     if (body.generatedQuestions !== undefined) {
       updateData.generatedQuestions = JSON.stringify(body.generatedQuestions);
     }
+    if (body.researchNotes !== undefined) {
+      updateData.researchNotes = JSON.stringify(body.researchNotes);
+    }
 
     const analysis = await prisma.companyAnalysis.update({
       where: { id },

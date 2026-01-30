@@ -20,6 +20,9 @@ model User {
   decisions        Decision[]
   watchlistItems   WatchlistItem[]
   portfolioReviews PortfolioReview[]
+  portfolioScans   PortfolioScan[]
+  portfolioAlerts  PortfolioAlert[]
+  watchlistScans   WatchlistScan[]
   settings         UserSettings?
 }
 
@@ -72,6 +75,9 @@ model CompanyAnalysis {
 
   // Generated questions
   generatedQuestions String? // JSON array: [{ question, category, answered }]
+
+  // Research notes
+  researchNotes String? // JSON array: [{ id, content, createdAt }]
 
   // Verdict
   verdict          String? // "BUY", "WATCH", "PASS"
@@ -126,6 +132,7 @@ model MacroReport {
   riskLevel             String? // "Low", "Moderate", "Elevated", "High", "Critical"
 
   executiveSummary String?
+  simplifiedReport String? // Cached Easy Read version
   fullReport       String?
   rawData          String? // JSON: all raw Perplexity responses
 
@@ -193,6 +200,10 @@ model WatchlistItem {
   targetPrice    Float?
   targetCondition String? // e.g., "Below $300" or "P/E under 20"
 
+  analysisId  String?  // Link to CompanyAnalysis that auto-added this item
+  lastChecked DateTime?
+  latestNote  String?  // Most recent scan finding for this ticker
+
   status String @default("ACTIVE") // ACTIVE, TRIGGERED, REMOVED
 
   createdAt DateTime @default(now())
@@ -217,6 +228,61 @@ model PortfolioReview {
   fullReport       String?
 
   status String @default("IN_PROGRESS") // IN_PROGRESS, COMPLETE, FAILED
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PortfolioScan {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  status          String @default("IN_PROGRESS") // IN_PROGRESS, COMPLETE, FAILED
+  tickersScanned  String?  // JSON array of tickers
+  alertsGenerated Int      @default(0)
+  summary         String?
+  rawData         String?
+
+  alerts PortfolioAlert[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PortfolioAlert {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  ticker          String?  // null for portfolio-level alerts
+  alertType       String   // NEWS, FUNDAMENTAL, MACRO, THESIS_VIOLATION, WATCHLIST_ADD
+  severity        String   // INFO, WARNING, CRITICAL
+  severityLevel   Int      @default(0) // 3=CRITICAL, 2=WARNING, 1=INFO (for sorting)
+  title           String
+  description     String
+  actionSuggested String?
+
+  source String  // PORTFOLIO_SCAN, MACRO_REPORT
+  scanId String?
+  scan   PortfolioScan? @relation(fields: [scanId], references: [id])
+
+  status String @default("UNREAD") // UNREAD, READ, DISMISSED
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WatchlistScan {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  status          String @default("IN_PROGRESS") // IN_PROGRESS, COMPLETE, FAILED
+  tickersScanned  String?  // JSON array of tickers
+  itemsChecked    Int      @default(0)
+  summary         String?
+  rawData         String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
