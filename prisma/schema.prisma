@@ -1,0 +1,223 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String   @default("George")
+  email     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  companyAnalyses  CompanyAnalysis[]
+  macroReports     MacroReport[]
+  holdings         Holding[]
+  decisions        Decision[]
+  watchlistItems   WatchlistItem[]
+  portfolioReviews PortfolioReview[]
+  settings         UserSettings?
+}
+
+model UserSettings {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  // Allocation targets (stored as JSON: { "liquid": 65, "equities": 12.5, "crypto": 10, ... })
+  allocationTargets String @default("{}")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CompanyAnalysis {
+  id          String @id @default(cuid())
+  userId      String
+  user        User   @relation(fields: [userId], references: [id])
+  ticker      String
+  companyName String @default("")
+
+  status String @default("IN_PROGRESS") // IN_PROGRESS, COMPLETE, FAILED
+
+  // Financials
+  revenueGrowth    String? // JSON: { periods, values, trend }
+  ownerEarnings    String? // JSON: { calculation, values }
+  margins          String? // JSON: { gross, operating, net, trends }
+  roic             String? // JSON: { current, historical, vsWacc }
+  debtToEquity     Float?
+  freeCashFlow     String? // JSON: { values, trend, perShare }
+
+  // Moat assessment
+  moatType         String? // e.g., "Wide", "Narrow", "None"
+  moatScore        Int?    // 1-10
+  moatEvidence     String? // JSON array of evidence strings
+  moatThreats      String? // JSON array of threat strings
+
+  // AI disruption
+  aiDisruptionLevel String? // "Low", "Medium", "High", "Critical"
+  aiDisruptionScore Int?    // 1-10
+  aiDisruptionAnalysis String? // Free text analysis
+
+  // Buffett scores (1-10 each)
+  businessQualityScore  Int?
+  managementScore       Int?
+  financialStrengthScore Int?
+  valuationScore        Int?
+  moatDurabilityScore   Int?
+
+  // Generated questions
+  generatedQuestions String? // JSON array: [{ question, category, answered }]
+
+  // Verdict
+  verdict          String? // "BUY", "WATCH", "PASS"
+  verdictReasoning String?
+  executiveSummary String?
+  fullReport       String? // Full markdown report
+  keyRisks         String? // JSON array
+  keyCatalysts     String? // JSON array
+
+  // Raw data
+  rawPerplexityData String? // JSON: all Perplexity responses
+  rawClaudeResponse String? // Full Claude response
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  decisions Decision[]
+}
+
+model MacroReport {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  status     String   @default("IN_PROGRESS") // IN_PROGRESS, COMPLETE, FAILED
+  reportDate DateTime @default(now())
+
+  // Cycle positions
+  shortTermDebtCycle String? // JSON: { position, description }
+  longTermDebtCycle  String? // JSON: { position, description }
+  businessCycle      String? // JSON: { position, description }
+
+  // Indicators
+  fedFundsRate     Float?
+  yieldCurve       String? // JSON: { spread, inverted, description }
+  cpiInflation     Float?
+  pceInflation     Float?
+  unemploymentRate Float?
+  gdpGrowth        Float?
+  creditSpreads    String? // JSON: { ig, hy, trend }
+  m2MoneySupply    String? // JSON: { growth, trend }
+
+  // Historical analog
+  historicalAnalogPeriod      String? // e.g., "Late 1990s"
+  historicalAnalogDescription String?
+  historicalAnalogSimilarities String? // JSON array
+  historicalAnalogDifferences  String? // JSON array
+
+  // Implications
+  portfolioImplications String? // JSON array of actionable items
+  thingsToWatch         String? // JSON array: [{ indicator, threshold, currentValue }]
+  riskLevel             String? // "Low", "Moderate", "Elevated", "High", "Critical"
+
+  executiveSummary String?
+  fullReport       String?
+  rawData          String? // JSON: all raw Perplexity responses
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Holding {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  ticker      String
+  companyName String  @default("")
+  assetType   String  @default("EQUITY") // EQUITY, ETF, CRYPTO, BOND, CASH, OTHER
+  quantity    Float
+  costBasis   Float   // Per-unit cost
+  totalCost   Float   // quantity * costBasis
+  currentPrice Float  @default(0)
+  currentValue Float  @default(0)
+
+  entryDate    DateTime @default(now())
+  thesis       String?  // Why you bought
+  exitCriteria String?  // When you'd sell
+
+  status String @default("ACTIVE") // ACTIVE, SOLD, WATCHING
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  decisions Decision[]
+}
+
+model Decision {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  ticker         String
+  action         String  // BUY, SELL, PASS, WATCH, TRIM, ADD
+  decisionDate   DateTime @default(now())
+  priceAtDecision Float?
+  thesis         String?
+  reasoning      String?
+  followUpNotes  String? // JSON array: [{ date, note }]
+  outcome        String? // "CORRECT", "INCORRECT", "PENDING"
+
+  analysisId String?
+  analysis   CompanyAnalysis? @relation(fields: [analysisId], references: [id])
+  holdingId  String?
+  holding    Holding?         @relation(fields: [holdingId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WatchlistItem {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  ticker         String
+  companyName    String  @default("")
+  reason         String?
+  targetPrice    Float?
+  targetCondition String? // e.g., "Below $300" or "P/E under 20"
+
+  status String @default("ACTIVE") // ACTIVE, TRIGGERED, REMOVED
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, ticker])
+}
+
+model PortfolioReview {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  reviewDate          DateTime @default(now())
+  allocationSnapshot  String?  // JSON: current allocation breakdown
+  totalPortfolioValue Float?
+
+  thesisAlignmentResults  String? // JSON array: [{ ticker, aligned, notes }]
+  rebalancingSuggestions  String? // JSON array: [{ action, ticker, reason }]
+
+  executiveSummary String?
+  fullReport       String?
+
+  status String @default("IN_PROGRESS") // IN_PROGRESS, COMPLETE, FAILED
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
