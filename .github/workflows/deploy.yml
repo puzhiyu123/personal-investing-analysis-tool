@@ -1,0 +1,48 @@
+name: Deploy to GCE
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Build and push to GCR
+        run: |
+          gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/investing-app:latest --timeout=600
+
+      - name: Deploy to Compute Engine
+        run: |
+          gcloud compute ssh investing-app \
+            --zone=us-central1-a \
+            --command="
+              docker pull gcr.io/${{ secrets.GCP_PROJECT_ID }}/investing-app:latest && \
+              docker stop investing-app 2>/dev/null; \
+              docker rm investing-app 2>/dev/null; \
+              docker run -d \
+                --name investing-app \
+                --restart unless-stopped \
+                -p 80:3000 \
+                -v /home/georgepu/investing-data:/app/data \
+                -e DATABASE_URL=file:/app/data/invest.db \
+                -e AUTH_PASSWORD_HASH=${{ secrets.AUTH_PASSWORD_HASH }} \
+                -e AUTH_SECRET=${{ secrets.AUTH_SECRET }} \
+                -e ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }} \
+                -e PERPLEXITY_API_KEY=${{ secrets.PERPLEXITY_API_KEY }} \
+                -e NODE_ENV=production \
+                gcr.io/${{ secrets.GCP_PROJECT_ID }}/investing-app:latest && \
+              docker image prune -f
+            "
