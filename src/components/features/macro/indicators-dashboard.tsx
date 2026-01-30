@@ -112,7 +112,7 @@ export function IndicatorsDashboard({
     },
     {
       label: "Yield Curve (10Y-2Y)",
-      value: yc ? `${(yc.spread as number)?.toFixed(2) ?? "-"} bps` : "-",
+      value: yc?.spread != null ? `${Number(yc.spread).toFixed(2)} bps` : "-",
       note: yc?.inverted ? "INVERTED" : undefined,
       noteColor: yc?.inverted ? "text-red-600 font-bold" : undefined,
     },

@@ -32,23 +32,23 @@ export function VerdictCard({
   const verdictConfig = {
     BUY: {
       icon: CheckCircle,
-      color: "text-green-700",
-      bg: "bg-green-50",
-      border: "border-green-200",
+      color: "text-green-700 dark:text-green-400",
+      bg: "bg-green-50 dark:bg-green-950/40",
+      border: "border-green-200 dark:border-green-800",
       label: "BUY",
     },
     WATCH: {
       icon: Eye,
-      color: "text-amber-700",
-      bg: "bg-amber-50",
-      border: "border-amber-200",
+      color: "text-amber-700 dark:text-amber-400",
+      bg: "bg-amber-50 dark:bg-amber-950/40",
+      border: "border-amber-200 dark:border-amber-800",
       label: "WATCH",
     },
     PASS: {
       icon: XCircle,
-      color: "text-red-700",
-      bg: "bg-red-50",
-      border: "border-red-200",
+      color: "text-red-700 dark:text-red-400",
+      bg: "bg-red-50 dark:bg-red-950/40",
+      border: "border-red-200 dark:border-red-800",
       label: "PASS",
     },
   };
@@ -90,7 +90,7 @@ export function VerdictCard({
 
         <div className="grid gap-5 sm:grid-cols-2">
           {risks.length > 0 && (
-            <div className="rounded-xl border border-red-100 bg-red-50/30 p-4">
+            <div className="rounded-xl border border-red-100 dark:border-red-900 bg-red-50/30 dark:bg-red-950/20 p-4">
               <h4 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
                 <AlertTriangle className="h-4.5 w-4.5 text-red-500" />
                 Key Risks
@@ -110,7 +110,7 @@ export function VerdictCard({
           )}
 
           {catalysts.length > 0 && (
-            <div className="rounded-xl border border-green-100 bg-green-50/30 p-4">
+            <div className="rounded-xl border border-green-100 dark:border-green-900 bg-green-50/30 dark:bg-green-950/20 p-4">
               <h4 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
                 <Rocket className="h-4.5 w-4.5 text-green-500" />
                 Key Catalysts

@@ -110,8 +110,9 @@ export function FinancialAnalysis({
               label="Revenue Growth"
             >
               <p className="text-3xl font-bold tabular-nums">
-                {(revenue.fiveYearCAGR as number)?.toFixed(1) ??
-                  revenue.trend}
+                {revenue.fiveYearCAGR != null
+                  ? Number(revenue.fiveYearCAGR).toFixed(1)
+                  : revenue.trend}
                 {revenue.fiveYearCAGR != null && "%"}
               </p>
               {revenue.fiveYearCAGR != null && (
@@ -167,11 +168,11 @@ export function FinancialAnalysis({
               label="ROIC"
             >
               <p className="text-3xl font-bold tabular-nums">
-                {(roicData.current as number)?.toFixed(1) ?? "-"}%
+                {roicData.current != null ? Number(roicData.current).toFixed(1) : "-"}%
               </p>
               <p className="text-base text-muted-foreground">
                 5yr avg:{" "}
-                {(roicData.fiveYearAvg as number)?.toFixed(1) ?? "-"}%
+                {roicData.fiveYearAvg != null ? Number(roicData.fiveYearAvg).toFixed(1) : "-"}%
               </p>
               {roicData.vsWacc != null && (
                 <p className="text-base text-muted-foreground">
