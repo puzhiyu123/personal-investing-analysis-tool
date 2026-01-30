@@ -112,7 +112,7 @@ export function FinancialAnalysis({
               <p className="text-3xl font-bold tabular-nums">
                 {revenue.fiveYearCAGR != null
                   ? Number(revenue.fiveYearCAGR).toFixed(1)
-                  : revenue.trend}
+                  : String(revenue.trend ?? "-")}
                 {revenue.fiveYearCAGR != null && "%"}
               </p>
               {revenue.fiveYearCAGR != null && (
